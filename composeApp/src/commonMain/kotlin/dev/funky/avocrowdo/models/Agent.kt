@@ -37,7 +37,7 @@ data class SimpleAgent(
     override var position: Point,
     override var velocity: Point,
     val maxVelocity: Double,
-    val targetPosition: Point
+    val targetPosition: Point,
 ) : Agent {
     override fun update(state: GameState) {
         val distance: Point = targetPosition - position
@@ -56,26 +56,27 @@ data class PathFindingAgent(
     }
 }
 
-class AgentGenerator {
-    val interval: Double;
-    val agent: Agent;
-
+data class AgentGenerator(
+    /** The interval between generations. */
+    val interval: Double,
+    val agent: Agent,
+) {
     fun update() {
-        if (globalTime % interval == 0) {
-            gameState.agents.add(agent);
-        }
+//        if (globalTime % interval == 0) {
+//            gameState.agents.add(agent);
+//        }
     }
 }
 
-class AgentConsumer {
-    val interval: Double;
-    val position: Point;
-
+data class AgentConsumer(
+    val interval: Double,
+    val position: Point,
+) {
     fun update() {
-        for (agent in gameState.agents) {
-            if (agent.position == this.position) {
-                agents.remove(agent);
-            }
-        }
+//        for (agent in gameState.agents) {
+//            if (agent.position == this.position) {
+//                agents.remove(agent);
+//            }
+//        }
     }
 }
