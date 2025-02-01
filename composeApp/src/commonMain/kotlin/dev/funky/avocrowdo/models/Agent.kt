@@ -24,11 +24,46 @@ data class RandomAgent(
     override val size: Int,
     override var position: Point,
     override var velocity: Point,
-    val maxVelocity: Double
+    val maxVelocity: Double,
 ) : Agent {
     override fun update(state: GameState) {
         val xSpeed = Random.nextDouble(0.0, maxVelocity)
         val ySpeed = (maxVelocity.pow(2) - xSpeed.pow(2)).pow(0.5)
         velocity = Point(xSpeed, ySpeed)
+    }
+}
+
+data class PathFindingAgent(
+    override val size: Int,
+    override var position: Point,
+    override var velocity: Point,
+    var target: Point,
+) : Agent {
+    override fun update(state: GameState) {
+        TODO("Not yet implemented")
+    }
+}
+
+class AgentGenerator {
+    val interval: Double;
+    val agent: Agent;
+
+    fun update() {
+        if (globalTime % interval == 0) {
+            gameState.agents.add(agent);
+        }
+    }
+}
+
+class AgentConsumer {
+    val interval: Double;
+    val position: Point;
+
+    fun update() {
+        for (agent in gameState.agents) {
+            if (agent.position == this.position) {
+                agents.remove(agent);
+            }
+        }
     }
 }
