@@ -16,7 +16,6 @@ interface Agent {
     fun update(state: GameState)
 
     fun step() {
-        ()
     }
 }
 
