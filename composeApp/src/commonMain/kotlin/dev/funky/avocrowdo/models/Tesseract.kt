@@ -5,62 +5,67 @@ import androidx.compose.material3.SliderState
 import androidx.compose.runtime.mutableStateOf
 import models.Agent
 import models.GameState
-import models.PathFindingAgent
 import models.Point
 import models.Polygon
 import models.SimpleAgent
+import kotlin.random.Random
 
-val exampleObjects: List<Polygon> = listOf(
+val exampleObjects: List<Polygon> = List(12) {
     Polygon(
-        points = listOf(
-            Point(100.0, 100.0),
-            Point(200.0, 100.0),
-            Point(200.0, 200.0),
-            Point(100.0, 200.0),
+        listOf(
+            Point(it * 200.0, 200.0),
+            Point(it * 200.0 + 150, 200.0),
+            Point(it * 200.0 + 150, 300.0),
+            Point(it * 200.0, 300.0)
         ),
-        hollow = true
-    ),
+        false
+    )
+}.plus(List(36) {
     Polygon(
-        points = listOf(
-            Point(400.0, 150.0),
-            Point(500.0, 150.0),
-            Point(500.0, 250.0),
-            Point(400.0, 250.0),
+        listOf(
+            Point((it % 4) * 200.0 + 50, (it / 4) * 200.0 + 350),
+            Point((it % 4) * 200.0 + 150, (it / 4) * 200.0 + 350),
+            Point((it % 4) * 200.0 + 150, (it / 4) * 200.0 + 400),
+            Point((it % 4) * 200.0 + 50, (it / 4) * 200.0 + 400)
         ),
-        hollow = true
-    ),
+        true
+    )
+}).plusElement(
+    Polygon(
+        listOf(
+            Point(1200.0, 800.0),
+            Point(1250.0, 800.0),
+            Point(1250.0, 500.0),
+            Point(1350.0, 500.0),
+            Point(1350.0, 400.0),
+            Point(1200.0, 400.0),
+        ),
+        false
+    )
 )
 
-val exampleAgents: List<Agent> = listOf(
+val random = Random(System.currentTimeMillis())
+val center = Point(800.0, 800.0)
+val radius = 400.0
+
+val exampleAgents: List<Agent> = List(25) {
+    var x: Double
+    var y: Double
+    do {
+        x = random.nextDouble(0.0, 900.0)
+        y = random.nextDouble(0.0, 1200.0)
+    } while (exampleObjects.any { it.contains(Point(x, y), 10) })
+
+    val targetX = 1200.0
+    val targetY = random.nextDouble(450.0, 750.0)
     SimpleAgent(
-        position = Point(80.0, 120.0),
-        velocity = Point(1.0, 0.0),
+        position = Point(x, y),
+        velocity = Point(0.0, 0.0),
         size = 10,
-        maxVelocity = 1.0,
-        target = Point(1000.0, 500.0),
-    ),
-    SimpleAgent(
-        position = Point(60.0, 90.0),
-        velocity = Point(-1.0, 0.0),
-        size = 10,
-        maxVelocity = 1.0,
-        target = Point(1000.0, 500.0),
-    ),
-    PathFindingAgent(
-        position = Point(90.0, 60.0),
-        velocity = Point(0.0, -1.0),
-        size = 10,
-        maxVelocity = 1.0,
-        target = Point(1000.0, 500.0),
-    ),
-    PathFindingAgent(
-        position = Point(350.0, 130.0),
-        velocity = Point(0.0, 1.0),
-        size = 10,
-        maxVelocity = 1.0,
-        target = Point(1000.0, 500.0),
-    ),
-)
+        maxVelocity = 5.0,
+        target = Point(targetX, targetY)
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 object Tesseract {
