@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import kotlinx.serialization.Serializable
 
 /**
- * A shape that can be drawn on a canvas. There also exist [DynamicObject]s, which are a sub-sealed class of [Object].
+ * A shape that can be drawn on a canvas.
  */
 @Serializable
 sealed interface Object {

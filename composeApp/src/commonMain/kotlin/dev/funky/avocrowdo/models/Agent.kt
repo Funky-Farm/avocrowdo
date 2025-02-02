@@ -10,13 +10,43 @@ import kotlin.random.Random
  * An entity that moves around in a space.
  */
 interface Agent {
-    /** An agent's size, which is used to determine its collision radius. */
+    /** The agent's size, which is used to determine its collision radius. */
     val size: Int
+
+    /** The agent's current position. */
     var position: Point
+
+    /** The agent's current velocity. */
     var velocity: Point
 
+    /** Update the agent's position and velocity, given an observation of the game. */
     fun update(state: GameState)
 
+    /** Execute the agent's movement, given a velocity. This function accounts for collisions. */
+    fun execute(state: GameState, velocity: Point) {
+        // Update the agent's position. If the agent "bumps into" anything, it should go as far as possible to just
+        // about touch the object.
+        val (xCollide, yCollide) = state.objects.map { obj ->
+            val xCollide = obj.contains(Point(position.x + velocity.x, position.y), size)
+            val yCollide = obj.contains(Point(position.x, position.y + velocity.y), size)
+            Pair(xCollide, yCollide)
+        }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }.let {
+            if (it.first || it.second) return@let Pair(it.first, it.second)
+
+            return@let state.agents.map { agent ->
+                val xCollide = agent.position != position
+                    && agent.collides(Point(position.x + velocity.x, position.y), size)
+                val yCollide = agent.position != position
+                    && agent.collides(Point(position.x, position.y + velocity.y), size)
+                Pair(xCollide, yCollide)
+            }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }
+        }
+
+        if (!xCollide) position.x += velocity.x
+        if (!yCollide) position.y += velocity.y
+    }
+
+    /** Draw the agent in a particular scope. */
     fun draw(scope: DrawScope) {
         scope.drawCircle(
             color = Color.Black,
@@ -26,11 +56,15 @@ interface Agent {
         )
     }
 
+    /** Check if this agent collides with some other agent at [point] with radius [radius]. */
     fun collides(point: Point, radius: Int): Boolean {
         return (point - position).magnitude() < size + radius
     }
 }
 
+/**
+ * An agent which behaves completely randomly.
+ */
 data class RandomAgent(
     override val size: Int,
     override var position: Point,
@@ -41,35 +75,7 @@ data class RandomAgent(
         val xSpeed = Random.nextDouble(0.0, maxVelocity)
         val ySpeed = (maxVelocity.pow(2) - xSpeed.pow(2)).pow(0.5)
         velocity = Point(xSpeed, ySpeed)
-
-        // Update the agent's position. If the agent "bumps into" anything, it should go as far as possible to just
-        // about touch the object.
-        val (xCollide, yCollide) = state.objects.map { obj ->
-            val xCollide = obj.contains(Point(position.x + velocity.x, position.y), size)
-            val yCollide = obj.contains(Point(position.x, position.y + velocity.y), size)
-            Pair(xCollide, yCollide)
-        }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }.let {
-            if (it.first || it.second) {
-                return@let Pair(it.first, it.second)
-            }
-
-            return@let state.agents.map { agent ->
-                val xCollide =
-                    agent.position != position && agent.collides(Point(position.x + velocity.x, position.y), size)
-                val yCollide =
-                    agent.position != position && agent.collides(Point(position.x, position.y + velocity.y), size)
-                Pair(xCollide, yCollide)
-            }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }
-        }
-
-        if (!xCollide) {
-            position.x += velocity.x
-        }
-
-        if (!yCollide) {
-            position.y += velocity.y
-        }
-
+        this.execute(state, velocity)
     }
 }
 
@@ -83,6 +89,7 @@ data class SimpleAgent(
     override fun update(state: GameState) {
         val distance: Point = targetPosition - position
         velocity = (distance / distance.magnitude()) * maxVelocity
+        this.execute(state, velocity)
     }
 }
 
@@ -94,30 +101,5 @@ data class PathFindingAgent(
 ) : Agent {
     override fun update(state: GameState) {
         TODO("Not yet implemented")
-    }
-}
-
-data class AgentGenerator(
-    /** The interval between generations. */
-    val interval: Double,
-    val agent: Agent,
-) {
-    fun update() {
-//        if (globalTime % interval == 0) {
-//            gameState.agents.add(agent);
-//        }
-    }
-}
-
-data class AgentConsumer(
-    val interval: Double,
-    val position: Point,
-) {
-    fun update() {
-//        for (agent in gameState.agents) {
-//            if (agent.position == this.position) {
-//                agents.remove(agent);
-//            }
-//        }
     }
 }
