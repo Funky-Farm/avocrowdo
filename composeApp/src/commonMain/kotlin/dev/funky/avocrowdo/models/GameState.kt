@@ -6,7 +6,6 @@ typealias Path = List<Edge>
 
 data class Graph(val vertices: Map<VertexId, Point>, val edges: List<Edge>, val weights: Map<Edge, Double>, val adj: Map<VertexId, MutableList<VertexId>>) {
     fun getWeight(edge: Edge): Double = weights.getOrElse(edge, {weights[Edge(edge.second, edge.first)]!!})
-
 }
 
 data class GameState(
@@ -14,7 +13,6 @@ data class GameState(
     val agents: List<Agent>,
     val width: Double,
     val height: Double,
-    val timestep: Double,
 ) {
     fun update() {
         agents.forEach { it.update(this) }

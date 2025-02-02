@@ -1,5 +1,6 @@
 package models
 
+import androidx.compose.ui.geometry.Offset
 import org.jetbrains.kotlinx.multik.api.linalg.solve
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
@@ -7,8 +8,6 @@ import org.jetbrains.kotlinx.multik.ndarray.data.D1
 import org.jetbrains.kotlinx.multik.ndarray.data.D2
 import org.jetbrains.kotlinx.multik.ndarray.data.NDArray
 import org.jetbrains.kotlinx.multik.ndarray.data.get
-import androidx.compose.ui.geometry.Offset
-import kotlinx.serialization.Serializable
 import kotlin.math.pow
 
 /**
@@ -48,12 +47,16 @@ class PointComparator : Comparator<Point> {
 fun linesIntersect(p1: Point, p2: Point, p3: Point, p4: Point): Boolean {
 
     // Set up the line intersection equations.
-    val a: NDArray<Double, D2> = mk.ndarray(mk[
-        mk[p2.x - p1.x, p1.y - p2.y],
-        mk[p4.x - p3.x, p3.y - p4.y]
-    ])
-    val b: NDArray<Double, D1> = mk.ndarray(mk[p1.x * p2.y - p2.x * p1.y,
-                                               p3.x * p4.y - p4.x * p3.y])
+    val a: NDArray<Double, D2> = mk.ndarray(
+        mk[
+            mk[p2.x - p1.x, p1.y - p2.y],
+            mk[p4.x - p3.x, p3.y - p4.y]
+        ]
+    )
+    val b: NDArray<Double, D1> = mk.ndarray(
+        mk[p1.x * p2.y - p2.x * p1.y,
+            p3.x * p4.y - p4.x * p3.y]
+    )
 
     // Calculate determinant.
     val det = a[0][0] * a[1][1] - a[0][1] * a[1][0]
