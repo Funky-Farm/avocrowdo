@@ -132,7 +132,7 @@ fun Canvas() {
 
     // Debug, populate gamestate
     LaunchedEffect(Unit) {
-        Tesseract.gameState = GameState(exampleObjects, exampleAgents)
+        Tesseract.gameState = GameState(exampleObjects, exampleAgents, 1000.0, 1000.0)
     }
 
     Box(Modifier.padding(16.dp)) {

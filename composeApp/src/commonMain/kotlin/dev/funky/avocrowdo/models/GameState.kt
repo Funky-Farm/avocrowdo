@@ -1,18 +1,15 @@
 package models
 
-import kotlinx.serialization.Serializable
-
 typealias VertexId = Int
 typealias Edge = Pair<VertexId, VertexId>
 
 data class Graph(val vertices: Map<VertexId, Point>, val edges: List<Edge>)
 
-@Serializable
 data class GameState(
-    val objects: List<Object>,
+    val objects: List<Polygon>,
     val agents: List<Agent>,
     val width: Double,
-    val height: Double
+    val height: Double,
 ) {
     fun update() {
         agents.forEach { it.update(this) }
