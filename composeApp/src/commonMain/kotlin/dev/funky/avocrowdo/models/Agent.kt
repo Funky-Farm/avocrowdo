@@ -49,6 +49,7 @@ data class PathFindingAgent(
     override val size: Int,
     override var position: Point,
     override var velocity: Point,
+    val maxVelocity: Double,
     var target: Point,
 ) : Agent {
     override fun update(state: GameState) {
