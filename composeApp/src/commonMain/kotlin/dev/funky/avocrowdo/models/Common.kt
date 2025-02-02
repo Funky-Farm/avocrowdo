@@ -14,7 +14,7 @@ import kotlin.math.pow
 /**
  * An arbitrary point on the canvas, in the form `(x, y)`.
  */
-data class Point(val x: Double, val y: Double) {
+data class Point(var x: Double, var y: Double) {
     fun magnitude(): Double = (this.x.pow(2) + this.y.pow(2)).pow(0.5)
     operator fun minus(other: Point): Point = Point(this.x - other.x, this.y - other.y)
     operator fun times(d: Double): Point = Point(this.x * d, this.y * d)
@@ -55,6 +55,12 @@ fun linesIntersect(p1: Point, p2: Point, p3: Point, p4: Point): Boolean {
     val b: NDArray<Double, D1> = mk.ndarray(mk[p1.x * p2.y - p2.x * p1.y,
                                                p3.x * p4.y - p4.x * p3.y])
 
+    // Calculate determinant.
+    val det = a[0][0] * a[1][1] - a[0][1] * a[1][0]
+    if (det == 0.0) {
+        return true
+    }
+
     // Try to find a solution.
     return try {
         val x: NDArray<Double, D1> = mk.linalg.solve(a, b)
@@ -77,6 +83,8 @@ fun lineIntersectsPolygon(p1: Point, p2: Point, obstacle: Polygon): Boolean {
 
     return linesIntersect(p1, p2, obstacle.points.last(), obstacle.points.first())
 }
+
+fun lineIntersectsObjects(p1: Point, p2: Point, objects: List<Polygon>): Boolean = objects.any { lineIntersectsPolygon(p1, p2, it) }
 /*
 ------
 |    |
