@@ -1,6 +1,9 @@
 package models
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
+import dev.funky.avocrowdo.models.Tesseract
 import java.util.*
 import kotlin.math.pow
 import kotlin.random.Random
@@ -85,10 +88,10 @@ data class SimpleAgent(
     override var position: Point,
     override var velocity: Point,
     val maxVelocity: Double,
-    val targetPosition: Point,
+    val target: Point,
 ) : Agent {
     override fun update(state: GameState) {
-        val distance: Point = targetPosition - position
+        val distance: Point = target - position
         velocity = (distance / distance.magnitude()) * maxVelocity
         this.execute(state, velocity)
     }
@@ -168,13 +171,9 @@ data class PathFindingAgent(
         velocity.x = vertices[firstEdge.second]!!.x - vertices[firstEdge.first]!!.x
         velocity.y = vertices[firstEdge.second]!!.y - vertices[firstEdge.first]!!.y
 
-        position += Point(velocity.x * state.timestep, velocity.y * state.timestep)
-    }
-}
-
-class aStarComparator(val graph: Graph, val heuristics: Map<VertexId, Double>): Comparator<VertexId> {
-    override fun compare(a: VertexId, b: VertexId): Int {
-
+        println(velocity)
+        position += Point(velocity.x * Tesseract.timeStep.value, velocity.y * Tesseract.timeStep.value)
+        println(position)
     }
 }
 
@@ -185,7 +184,8 @@ fun aStar(startId: VertexId, targetId: VertexId, graph: Graph): Path {
     val pathWeightFromStart: MutableMap<VertexId, Double> = mutableMapOf()
     val totalEstimateWeight: MutableMap<VertexId, Double> = mutableMapOf()
     val tree: MutableSet<VertexId> = mutableSetOf()
-    val fringe: PriorityQueue<VertexId> = PriorityQueue(INITIAL_PRIORITY_QUEUE_SIZE, compareBy{totalEstimateWeight[it]})
+    val fringe: PriorityQueue<VertexId> =
+        PriorityQueue(INITIAL_PRIORITY_QUEUE_SIZE, compareBy { totalEstimateWeight[it] })
 
     val targetPoint: Point = graph.vertices[targetId]!!
 

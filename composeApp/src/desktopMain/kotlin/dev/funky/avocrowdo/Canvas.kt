@@ -33,64 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import dev.funky.avocrowdo.Tesseract.currentTime
-import dev.funky.avocrowdo.Tesseract.totalTime
+import dev.funky.avocrowdo.models.Tesseract
+import dev.funky.avocrowdo.models.Tesseract.currentTime
+import dev.funky.avocrowdo.models.Tesseract.totalTime
+import dev.funky.avocrowdo.models.exampleAgents
+import dev.funky.avocrowdo.models.exampleObjects
 import kotlinx.coroutines.launch
-import models.Agent
 import models.GameState
-import models.Point
-import models.Polygon
-import models.RandomAgent
 import java.util.*
 import kotlin.concurrent.timer
-
-val exampleObjects: List<Polygon> = listOf(
-    Polygon(
-        points = listOf(
-            Point(100.0, 100.0),
-            Point(200.0, 100.0),
-            Point(200.0, 200.0),
-            Point(100.0, 200.0),
-        ),
-        hollow = true
-    ),
-    Polygon(
-        points = listOf(
-            Point(400.0, 150.0),
-            Point(500.0, 150.0),
-            Point(500.0, 250.0),
-            Point(400.0, 250.0),
-        ),
-        hollow = true
-    ),
-)
-
-val exampleAgents: List<Agent> = listOf(
-    RandomAgent(
-        position = Point(90.0, 90.0),
-        velocity = Point(1.0, 0.0),
-        size = 10,
-        maxVelocity = 1.0,
-    ),
-    RandomAgent(
-        position = Point(60.0, 90.0),
-        velocity = Point(-1.0, 0.0),
-        size = 10,
-        maxVelocity = 1.0,
-    ),
-    RandomAgent(
-        position = Point(90.0, 60.0),
-        velocity = Point(0.0, -1.0),
-        size = 10,
-        maxVelocity = 1.0,
-    ),
-    RandomAgent(
-        position = Point(350.0, 130.0),
-        velocity = Point(0.0, 1.0),
-        size = 10,
-        maxVelocity = 1.0,
-    ),
-)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
