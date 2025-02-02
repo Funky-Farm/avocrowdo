@@ -25,6 +25,8 @@ kotlin {
             implementation(libs.material3)
             implementation(libs.material.icons)
             implementation(libs.kotlinx.serialization.json)
+            implementation("org.jetbrains.kotlinx:multik-core:0.2.3")
+            implementation("org.jetbrains.kotlinx:multik-default:0.2.3")
         }
 
         desktopMain.dependencies {
@@ -45,3 +47,4 @@ compose.desktop {
         }
     }
 }
+

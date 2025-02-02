@@ -34,5 +34,5 @@ object Tesseract {
     var sliderEnabled = mutableStateOf(true)
     var sliderState = SliderState(0f, valueRange = 0f..100 * 1000f)
 
-    var gameState = GameState(exampleObjects, exampleAgents)
+    var gameState = GameState(exampleObjects, exampleAgents, 1000.0, 1000.0)
 }

@@ -10,7 +10,6 @@ import kotlinx.serialization.Serializable
 /**
  * A shape that can be drawn on a canvas.
  */
-@Serializable
 sealed interface Object {
     fun draw(scope: DrawScope)
 
@@ -24,7 +23,6 @@ sealed interface Object {
  * @param radius The radius of the circle. Precondition, the radius does not exceed the bounds of the canvas, with
  *               the center as the origin.
  */
-@Serializable
 data class Circle(val center: Point, val radius: UInt, val hollow: Boolean) : Object {
     override fun draw(scope: DrawScope) {
         scope.drawCircle(
@@ -46,7 +44,6 @@ data class Circle(val center: Point, val radius: UInt, val hollow: Boolean) : Ob
  * @param points The points that define the polygon. Precondition, these are within the bounds of the canvas.
  * @param hollow Whether the polygon should be hollow or filled.
  */
-@Serializable
 data class Polygon(val points: List<Point>, val hollow: Boolean) : Object {
     override fun draw(scope: DrawScope) {
         val path = Path()
