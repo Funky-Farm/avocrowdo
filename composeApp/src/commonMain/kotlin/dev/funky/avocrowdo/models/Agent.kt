@@ -3,7 +3,6 @@ package models
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
-import dev.funky.avocrowdo.models.Tesseract
 import java.util.*
 import kotlin.math.pow
 import kotlin.random.Random
@@ -168,12 +167,12 @@ data class PathFindingAgent(
         val agentPath: Path = aStar(-1, -2, agentGraph)
 
         val firstEdge = agentPath.first()
-        velocity.x = vertices[firstEdge.second]!!.x - vertices[firstEdge.first]!!.x
-        velocity.y = vertices[firstEdge.second]!!.y - vertices[firstEdge.first]!!.y
+        val xDistance = vertices[firstEdge.second]!!.x - vertices[firstEdge.first]!!.x
+        val yDistance = vertices[firstEdge.second]!!.y - vertices[firstEdge.first]!!.y
+        velocity = Point(xDistance, yDistance)
+        velocity = (velocity / velocity.magnitude()) * maxVelocity
 
-        println(velocity)
-        position += Point(velocity.x * Tesseract.timeStep.value, velocity.y * Tesseract.timeStep.value)
-        println(position)
+        this.execute(state, velocity)
     }
 }
 
