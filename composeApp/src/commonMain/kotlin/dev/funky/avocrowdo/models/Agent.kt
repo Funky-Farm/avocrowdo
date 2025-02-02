@@ -1,5 +1,8 @@
 package models
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -14,8 +17,17 @@ interface Agent {
 
     fun update(state: GameState)
 
-    fun step() {
-        TODO()
+    fun draw(scope: DrawScope) {
+        scope.drawCircle(
+            color = Color.Black,
+            style = Fill,
+            radius = size.toFloat(),
+            center = position.toOffset()
+        )
+    }
+
+    fun collides(point: Point, radius: Int): Boolean {
+        return (point - position).magnitude() < size + radius
     }
 }
 
@@ -29,6 +41,35 @@ data class RandomAgent(
         val xSpeed = Random.nextDouble(0.0, maxVelocity)
         val ySpeed = (maxVelocity.pow(2) - xSpeed.pow(2)).pow(0.5)
         velocity = Point(xSpeed, ySpeed)
+
+        // Update the agent's position. If the agent "bumps into" anything, it should go as far as possible to just
+        // about touch the object.
+        val (xCollide, yCollide) = state.objects.map { obj ->
+            val xCollide = obj.contains(Point(position.x + velocity.x, position.y), size)
+            val yCollide = obj.contains(Point(position.x, position.y + velocity.y), size)
+            Pair(xCollide, yCollide)
+        }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }.let {
+            if (it.first || it.second) {
+                return@let Pair(it.first, it.second)
+            }
+
+            return@let state.agents.map { agent ->
+                val xCollide =
+                    agent.position != position && agent.collides(Point(position.x + velocity.x, position.y), size)
+                val yCollide =
+                    agent.position != position && agent.collides(Point(position.x, position.y + velocity.y), size)
+                Pair(xCollide, yCollide)
+            }.reduce { acc, pair -> Pair(acc.first || pair.first, acc.second || pair.second) }
+        }
+
+        if (!xCollide) {
+            position.x += velocity.x
+        }
+
+        if (!yCollide) {
+            position.y += velocity.y
+        }
+
     }
 }
 

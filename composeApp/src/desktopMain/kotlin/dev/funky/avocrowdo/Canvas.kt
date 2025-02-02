@@ -31,20 +31,71 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import dev.funky.avocrowdo.Tesseract.currentTime
 import dev.funky.avocrowdo.Tesseract.totalTime
 import kotlinx.coroutines.launch
+import models.Agent
+import models.GameState
+import models.Point
+import models.Polygon
+import models.RandomAgent
 import java.util.*
 import kotlin.concurrent.timer
+
+val exampleObjects: List<Polygon> = listOf(
+    Polygon(
+        points = listOf(
+            Point(100.0, 100.0),
+            Point(200.0, 100.0),
+            Point(200.0, 200.0),
+            Point(100.0, 200.0),
+        ),
+        hollow = true
+    ),
+    Polygon(
+        points = listOf(
+            Point(400.0, 150.0),
+            Point(500.0, 150.0),
+            Point(500.0, 250.0),
+            Point(400.0, 250.0),
+        ),
+        hollow = true
+    ),
+)
+
+val exampleAgents: List<Agent> = listOf(
+    RandomAgent(
+        position = Point(90.0, 90.0),
+        velocity = Point(1.0, 0.0),
+        size = 10,
+        maxVelocity = 1.0,
+    ),
+    RandomAgent(
+        position = Point(60.0, 90.0),
+        velocity = Point(-1.0, 0.0),
+        size = 10,
+        maxVelocity = 1.0,
+    ),
+    RandomAgent(
+        position = Point(90.0, 60.0),
+        velocity = Point(0.0, -1.0),
+        size = 10,
+        maxVelocity = 1.0,
+    ),
+    RandomAgent(
+        position = Point(350.0, 130.0),
+        velocity = Point(0.0, 1.0),
+        size = 10,
+        maxVelocity = 1.0,
+    ),
+)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Canvas() {
-    var sliderEnabled by Tesseract.sliderEnabled
+    val sliderEnabled by Tesseract.sliderEnabled
     val sliderPosition = remember { Tesseract.sliderState }
     val sliderInteraction = remember { MutableInteractionSource() }
 
@@ -55,12 +106,15 @@ fun Canvas() {
     val scope = rememberCoroutineScope()
     var timer by remember { mutableStateOf<Timer?>(null) }
 
+    val gameState = remember { Tesseract.gameState }
+
     LaunchedEffect(playEnabled) {
         if (playEnabled) {
             timer = timer("Play", period = (1000f / Tesseract.TARGET_FPS).toLong()) {
                 scope.launch {
                     if (playEnabled) {
                         sliderPosition.value += timeStep
+                        gameState.update()
                         if (sliderPosition.value >= totalTime) playEnabled = false
                     }
                 }
@@ -76,14 +130,20 @@ fun Canvas() {
         }
     }
 
+    // Debug, populate gamestate
+    LaunchedEffect(Unit) {
+        Tesseract.gameState = GameState(exampleObjects, exampleAgents)
+    }
+
     Box(Modifier.padding(16.dp)) {
         androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            drawCircle(
-                color = Color.Red,
-                radius = radius,
-                center = center,
-                style = Stroke(width = 5f)
-            )
+            for (obj in gameState.objects) {
+                obj.draw(this)
+            }
+
+            for (agent in gameState.agents) {
+                agent.draw(this)
+            }
         }
 
         Row(
